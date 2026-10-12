@@ -1,0 +1,9 @@
+#!/bin/sh
+# Launch Roblox's built-in StudioMCP.exe inside Vinegar's Wine prefix (stdio MCP server).
+V="${VINEGAR_DIR:-$HOME/.local/share/vinegar}"
+export WINEPREFIX="$V/prefixes/studio"
+export WINEDEBUG=-all
+export WINEDLLOVERRIDES="winemenubuilder.exe,mscoree,mshtml="
+EXE=$(ls -td "$V"/versions/*/StudioMCP.exe 2>/dev/null | head -n1)
+[ -n "$EXE" ] || { echo "StudioMCP.exe not found under $V/versions" >&2; exit 1; }
+exec "$V/kombucha/bin/wine" "$EXE" "$@"
