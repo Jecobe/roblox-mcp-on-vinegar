@@ -1,4 +1,4 @@
-# roblox-studio-mcp-vinegar
+# roblox-mcp-on-vinegar
 
 Lets Claude Code (or any other MCP client) on Linux control Roblox Studio running under [Vinegar](https://vinegarhq.org).
 
@@ -13,14 +13,32 @@ This repo only contains the launcher script. It doesn't include or change any Ro
 
 ## Install
 
+One command (no clone needed):
+
 ```sh
-install -Dm755 roblox-studio-mcp ~/.local/bin/roblox-studio-mcp
+curl -fsSL https://raw.githubusercontent.com/Jecobe/roblox-mcp-on-vinegar/main/install.sh | sh
 ```
 
-Register it with Claude Code:
+Or clone the repo and run the installer:
 
 ```sh
-claude mcp add -s user Roblox_Studio ~/.local/bin/roblox-studio-mcp
+git clone https://github.com/Jecobe/roblox-mcp-on-vinegar
+cd roblox-mcp-on-vinegar
+./install.sh
+```
+
+The installer:
+- copies the launcher to `~/.local/bin/roblox-studio-mcp`
+- finds Vinegar's Studio install, native or Flatpak (native wins if both have Studio)
+- registers the `Roblox_Studio` MCP server with Claude Code at user scope, replacing an older registration of the same name
+
+Running it again updates the install. `./install.sh --uninstall` removes the launcher and the MCP server. To choose the Vinegar folder yourself, set `VINEGAR_DIR` before running the installer.
+
+### Manual install
+
+```sh
+install -Dm755 roblox-studio-mcp ~/.local/bin/roblox-studio-mcp
+claude mcp add -s user Roblox_Studio -- ~/.local/bin/roblox-studio-mcp
 ```
 
 For other clients, set the command to `~/.local/bin/roblox-studio-mcp` with stdio transport and no arguments.
@@ -33,14 +51,14 @@ Studio must be open, with this setting on, while the client is connected.
 
 ## Flatpak Vinegar
 
-The script reads from `~/.local/share/vinegar` by default. If you installed Vinegar through Flatpak, set `VINEGAR_DIR` to the Flatpak data folder:
+The installer finds a Flatpak Vinegar install on its own. If you install manually, give the launcher the Flatpak data folder:
 
 ```sh
-claude mcp add -s user -e VINEGAR_DIR="$HOME/.var/app/org.vinegarhq.Vinegar/data/vinegar" \
-  Roblox_Studio ~/.local/bin/roblox-studio-mcp
+claude mcp add -s user Roblox_Studio -e VINEGAR_DIR="$HOME/.var/app/org.vinegarhq.Vinegar/data/vinegar" \
+  -- ~/.local/bin/roblox-studio-mcp
 ```
 
-If both native and Flatpak Vinegar are installed, you can keep the default. The MCP server connects to Studio over localhost, so it can still reach a Studio that was launched from the Flatpak.
+The MCP server connects to Studio over localhost, so it works however Studio was launched.
 
 ## Troubleshooting
 
